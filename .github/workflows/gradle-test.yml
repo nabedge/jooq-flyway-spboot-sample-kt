@@ -1,0 +1,51 @@
+name: Unit test and build
+
+on:
+    # プッシュもしくはプルリクエストでワークフローを起動する
+    # ただしmasterブランチに対してのみ
+    push:
+        branches:
+            - master
+    pull_request:
+        branches:
+            - master
+
+jobs:
+    build:
+        runs-on: ubuntu-16.04
+        steps:
+            -   name: Checkout source code
+                uses: actions/checkout@v1
+
+            -   name: Set up JDK 11
+                uses: actions/setup-java@v1
+                with:
+                    java-version: 11.0.2
+
+            -   name: install psql command
+                run: sudo apt-get update && sudo apt-get install -y postgresql-client-9.5
+
+            -   name: Start docker container
+                env:
+                    TZ: "Asia/Tokyo"
+                run: docker-compose -f ./docker/docker-compose.yml up -d
+
+            -   name: create table on database
+                env:
+                    TZ: "Asia/Tokyo"
+                run: ./gradlew flywayMigrate -p pj-db
+
+            -   name: execute jOOQ code generator
+                run: ./gradlew test -p pj-db-gen
+
+            -   name: insert test data by flyway
+                run: ./gradlew testClasses flywayMigrate -Dflyway.locations=classpath:testdata -p pj-db
+
+            -   name: test and build application
+                run: ./gradlew build -p pj-web
+
+            -   name: Archive test report
+                uses: actions/upload-artifact@v1
+                with:
+                    name: gradle-test-report
+                    path: pj-web/build/reports/tests/test
