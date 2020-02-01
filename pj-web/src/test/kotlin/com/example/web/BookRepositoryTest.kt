@@ -21,8 +21,8 @@ class BookRepositoryTest {
         assertThat(selected).isNotEmpty()
     }
     
-    @Test
-    fun fail() {
-        fail()
-    }
+//    @Test
+//    fun fail() {
+//        fail()
+//    }
 }
