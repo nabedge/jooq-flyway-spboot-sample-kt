@@ -20,4 +20,9 @@ class BookRepositoryTest {
         val selected = bookRepository.selectAll()
         assertThat(selected).isNotEmpty()
     }
+    
+    @Test
+    fun fail() {
+        fail()
+    }
 }
