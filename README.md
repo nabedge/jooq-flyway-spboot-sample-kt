@@ -12,3 +12,4 @@ Run with:
     ./gradlew bootRun -p pj-web
     or
     java -jar ./pj-web/build/libs/pj-web-1.0-SNAPSHOT.jar
+
